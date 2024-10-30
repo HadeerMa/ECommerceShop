@@ -17,18 +17,19 @@ class Cart extends StatelessWidget {
       },
       builder: (context, state) {
         return Scaffold(
-            body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          child: Column(
-            children: [
-              Expanded(
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Column(
+              children: [
+                Expanded(
                   child: cubit.CartsList.isEmpty
                       ? Center(
                           child: Textapp(
-                              TextApp: 'Loading...',
-                              weight: FontWeight.w600,
-                              TextColor: Colors.black,
-                              size: 20),
+                            TextApp: 'Loading...',
+                            weight: FontWeight.w600,
+                            TextColor: Colors.black,
+                            size: 20,
+                          ),
                         )
                       : ListView.builder(
                           itemCount: cubit.CartsList.length,
@@ -47,13 +48,10 @@ class Cart extends StatelessWidget {
                                     height: 100,
                                     fit: BoxFit.fill,
                                   ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
+                                  SizedBox(width: 10),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
                                         Textapp(
                                           TextApp: cubit.CartsList[index].name!,
@@ -65,21 +63,16 @@ class Cart extends StatelessWidget {
                                         Row(
                                           children: [
                                             Textapp(
-                                              TextApp:
-                                                  "${cubit.CartsList[index].price!}\$",
+                                              TextApp: "${cubit.CartsList[index].price!}\$",
                                               weight: FontWeight.w600,
                                               TextColor: Colors.black,
                                               size: 20,
                                               lines: 1,
                                             ),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            if (cubit.CartsList[index].price !=
-                                                cubit.CartsList[index].oldprice)
+                                            SizedBox(width: 5),
+                                            if (cubit.CartsList[index].price != cubit.CartsList[index].oldprice)
                                               Textapp(
-                                                TextApp:
-                                                    "${cubit.CartsList[index].oldprice!}\$",
+                                                TextApp: "${cubit.CartsList[index].oldprice!}\$",
                                                 weight: FontWeight.w600,
                                                 TextColor: Colors.black,
                                                 size: 20,
@@ -87,44 +80,34 @@ class Cart extends StatelessWidget {
                                               ),
                                           ],
                                         ),
-                                        SizedBox(
-                                          height: 5,
-                                        ),
+                                        SizedBox(height: 5),
                                         Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             OutlinedButton(
-                                                onPressed: () {
-                                                  cubit.removeOraddFavorite(
-                                                    productID: cubit
-                                                        .CartsList[index].id
-                                                        .toString(),
-                                                  );
-                                                },
-                                                child: Icon(
-                                                  Icons.favorite,
-                                                  color: cubit
-                                                          .productIDFavorites
-                                                          .contains(cubit
-                                                              .CartsList[index]
-                                                              .id
-                                                              .toString())
-                                                      ? Colors.red
-                                                      : Colors.grey,
-                                                )),
+                                              onPressed: () {
+                                                cubit.removeOraddFavorite(
+                                                  productID: cubit.CartsList[index].id.toString(),
+                                                );
+                                              },
+                                              child: Icon(
+                                                Icons.favorite,
+                                                color: cubit.productIDFavorites.contains(cubit.CartsList[index].id.toString())
+                                                    ? Colors.red
+                                                    : Colors.grey,
+                                              ),
+                                            ),
                                             GestureDetector(
                                               onTap: () {
                                                 cubit.removeOraddCarts(
-                                                    ID: cubit
-                                                        .CartsList[index].id
-                                                        .toString());
+                                                  ID: cubit.CartsList[index].id.toString(),
+                                                );
                                               },
                                               child: Icon(
                                                 Icons.delete,
                                                 color: Colors.red,
                                               ),
-                                            )
+                                            ),
                                           ],
                                         ),
                                       ],
@@ -133,17 +116,79 @@ class Cart extends StatelessWidget {
                                 ],
                               ),
                             );
-                          })),
-              Container(
-                child: Textapp(
-                    TextApp: 'Total Price : ${cubit.totalPrice} \$',
-                    weight: FontWeight.w700,
-                    TextColor: Colors.black,
-                    size: 20),
-              )
+                          },
+                        ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Textapp(
+                      TextApp: 'Total Price : ${cubit.totalPrice} \$',
+                      weight: FontWeight.w700,
+                      TextColor: Colors.black,
+                      size: 20,
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        _showCheckoutDialog(context, cubit);
+                      },
+                      child: Text('Checkout'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showCheckoutDialog(BuildContext context, ProfileCubit cubit) {
+    final addressController = TextEditingController();
+    final emailController = TextEditingController();
+    final phoneController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Confirm Order"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: addressController,
+                decoration: InputDecoration(labelText: 'Address'),
+              ),
+              TextFormField(
+                controller: emailController,
+                decoration: InputDecoration(labelText: 'Email'),
+              ),
+              TextFormField(
+                controller: phoneController,
+                decoration: InputDecoration(labelText: 'Phone Number'),
+              ),
             ],
           ),
-        ));
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                cubit.CartsList.clear();
+                cubit.totalPrice = 0;
+                Navigator.of(context).pop();
+                cubit.emit(CartsSuccessstate()); // تحديث الحالة لإعادة بناء الواجهة
+              },
+              child: Text("Confirm Order"),
+            ),
+          ],
+        );
       },
     );
   }
